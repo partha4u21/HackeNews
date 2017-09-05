@@ -2,23 +2,13 @@ package com.avatar.hackernews.models;
 
 import org.json.JSONArray;
 
+import io.realm.RealmObject;
+
 /**
  * Created by parthamurmu on 05/09/17.
  */
 
-public class TopStories {
-
-
-//   "by" : "pg",
-//  "descendants" : 54,
-//          "id" : 126809,
-//          "kids" : [ 126822, 126823, 126917, 126993, 126824, 126934, 127411, 126888, 127681, 126818, 126816, 126854, 127095, 126861, 127313, 127299, 126859, 126852, 126882, 126832, 127072, 127217, 126889, 126875, 127535 ],
-//          "parts" : [ 126810, 126811, 126812 ],
-//          "score" : 47,
-//          "time" : 1204403652,
-//          "title" : "Poll: What would happen if News.YC had explicit support for polls?",
-//          "type" : "poll"
-
+public class TopStories extends RealmObject {
 
     private String id;
     private String title;
@@ -30,7 +20,7 @@ public class TopStories {
     private String type;
     private int descendants;
 
-    public static String getId() {
+    public String getId() {
         return id;
     }
 
@@ -38,20 +28,69 @@ public class TopStories {
         this.id = id;
     }
 
-    public static String getTitle() {
+    public String getTitle() {
         return title;
     }
 
-    public void setTitle(String id) {
+    public void setTitle(String title) {
         this.title = title;
     }
 
-    public static JSONArray getKids() {
+    public JSONArray getParent() {
+        return parent;
+    }
+
+    public void setParent(JSONArray parent) {
+        this.parent = parent;
+    }
+
+    public JSONArray getKids() {
         return kids;
     }
 
-    public static void setId(String id) {
-        TopStories.id = id;
+    public void setKids(JSONArray kids) {
+        this.kids = kids;
     }
+
+    public JSONArray getParts() {
+        return parts;
+    }
+
+    public void setParts(JSONArray parts) {
+        this.parts = parts;
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    public void setSCore(int id) {
+        this.score = score;
+    }
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public int getDescendents() {
+        return descendants;
+    }
+
+    public void setDescendants(int descendants) {
+        this.descendants = descendants;
+    }
+
 
 }

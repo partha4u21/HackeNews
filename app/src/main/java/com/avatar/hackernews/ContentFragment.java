@@ -16,7 +16,7 @@ public class ContentFragment extends android.support.v4.app.Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_layout,container);
+        View view = inflater.inflate(R.layout.fragment_layout, container, false);
         return view;
     }
 }

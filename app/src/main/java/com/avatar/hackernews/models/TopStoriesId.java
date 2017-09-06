@@ -10,7 +10,7 @@ import io.realm.RealmObject;
  * Created by parthamurmu on 05/09/17.
  */
 
-public class TopStoriesList extends RealmObject {
+public class TopStoriesId extends RealmObject {
 
     private String storiesArray;
 

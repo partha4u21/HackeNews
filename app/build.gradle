@@ -33,5 +33,6 @@ dependencies {
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     compile 'com.google.firebase:firebase-auth:10.0.1'
     compile 'com.squareup.okhttp:okhttp:2.5.0'
+    compile 'io.realm:android-adapters:2.1.0'
 }
 apply plugin: 'com.google.gms.google-services'

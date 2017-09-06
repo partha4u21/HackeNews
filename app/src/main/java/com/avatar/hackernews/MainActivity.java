@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.widget.LinearLayoutManager;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -22,6 +23,8 @@ import com.squareup.okhttp.Response;
 import com.squareup.okhttp.internal.http.RealResponseBody;
 
 import java.io.IOException;
+
+import io.realm.RealmResults;
 
 import static com.avatar.hackernews.R.id.textView;
 
@@ -66,6 +69,30 @@ public class MainActivity extends AppCompatActivity
         fragmentTransaction.replace(R.id.content_view, fragmentDemo);
         fragmentTransaction.commit();
     }
+
+    public void setRealmAdapter(RealmResults<Book> books) {
+
+        RealmBooksAdapter realmAdapter = new RealmBooksAdapter(this.getApplicationContext(), books, true);
+        // Set the data and tell the RecyclerView to draw
+        adapter.setRealmAdapter(realmAdapter);
+        adapter.notifyDataSetChanged();
+    }
+
+    private void setupRecycler() {
+        // use this setting to improve performance if you know that changes
+        // in content do not change the layout size of the RecyclerView
+        recycler.setHasFixedSize(true);
+
+        // use a linear layout manager since the cards are vertically scrollable
+        final LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        recycler.setLayoutManager(layoutManager);
+
+        // create an empty adapter and add it to the recycler view
+        adapter = new BooksAdapter(this);
+        recycler.setAdapter(adapter);
+    }
+
 
     private class CreateTopStoryRequest extends AsyncTask<String, Void, String> {
         @Override

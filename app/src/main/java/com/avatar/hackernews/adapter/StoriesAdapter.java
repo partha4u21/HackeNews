@@ -1,9 +1,12 @@
 package com.avatar.hackernews.adapter;
 
+/**
+ * Created by parthamurmu on 06/09/17.
+ */
+
 import android.content.Context;
 import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,12 +19,8 @@ import android.widget.Toast;
 import com.avatar.hackernews.R;
 import com.avatar.hackernews.RealmController;
 import com.avatar.hackernews.models.TopStories;
-import com.bumptech.glide.Glide;
 
-import app.androidhive.info.realm.app.Prefs;
-import app.androidhive.info.realm.model.Book;
 import io.realm.Realm;
-import io.realm.RealmResults;
 
 public class StoriesAdapter extends RealmRecyclerViewAdapter<TopStories> {
 
@@ -173,3 +172,4 @@ public class StoriesAdapter extends RealmRecyclerViewAdapter<TopStories> {
         }
     }
 }
+

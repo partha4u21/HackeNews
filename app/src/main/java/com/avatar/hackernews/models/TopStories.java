@@ -1,8 +1,7 @@
 package com.avatar.hackernews.models;
 
-import org.json.JSONArray;
-
 import io.realm.RealmObject;
+import io.realm.annotations.Required;
 
 /**
  * Created by parthamurmu on 05/09/17.
@@ -10,14 +9,26 @@ import io.realm.RealmObject;
 
 public class TopStories extends RealmObject {
 
+    @Required
     private String id;
+
+    @Required
     private String title;
-    private JSONArray parent;
-    private JSONArray kids;
-    private JSONArray parts;
+
+    private String parent;
+
+    private String kids;
+
+    private String parts;
+
     private int score;
+
+    @Required
     private String time;
+
+    @Required
     private String type;
+
     private int descendants;
 
     public String getId() {
@@ -36,27 +47,27 @@ public class TopStories extends RealmObject {
         this.title = title;
     }
 
-    public JSONArray getParent() {
+    public String getParent() {
         return parent;
     }
 
-    public void setParent(JSONArray parent) {
+    public void setParent(String parent) {
         this.parent = parent;
     }
 
-    public JSONArray getKids() {
+    public String getKids() {
         return kids;
     }
 
-    public void setKids(JSONArray kids) {
+    public void setKids(String kids) {
         this.kids = kids;
     }
 
-    public JSONArray getParts() {
+    public String getParts() {
         return parts;
     }
 
-    public void setParts(JSONArray parts) {
+    public void setParts(String parts) {
         this.parts = parts;
     }
 

@@ -1,5 +1,8 @@
 package com.avatar.hackernews;
 
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -13,8 +16,19 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
+import com.squareup.okhttp.internal.http.RealResponseBody;
+
+import java.io.IOException;
+
+import static com.avatar.hackernews.R.id.textView;
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
+    OkHttpClient client = new OkHttpClient();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +54,47 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        addFragment();
+    }
+
+    private void addFragment() {
+        ContentFragment fragmentDemo = new ContentFragment();
+        android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
+        android.support.v4.app.FragmentTransaction fragmentTransaction =
+                fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.content_view, fragmentDemo);
+        fragmentTransaction.commit();
+    }
+
+    private class CreateTopStoryRequest extends AsyncTask<String, Void, String> {
+        @Override
+        protected String doInBackground(String... urls) {
+            Request request = new Request.Builder()
+                    .url(urls[0])
+                    .build();
+            Response response = null;
+            try {
+                response = client.newCall(request).execute();
+                System.out.println((response.body()).string());
+                return response.toString();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return "Download failed";
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+        }
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        CreateTopStoryRequest createTopStoryRequest = new CreateTopStoryRequest();
+        createTopStoryRequest.execute("https://hacker-news.firebaseio.com/v0/topstories.json?print=pretty");
     }
 
     @Override

@@ -12,13 +12,13 @@ import io.realm.RealmObject;
 
 public class TopStoriesId extends RealmObject {
 
-    private String storiesArray;
+    private String storiesId;
 
-    private void setStoriesArray(String storiesArray){
-        this.storiesArray = storiesArray;
+    public void setStoriesId(String id){
+        this.storiesId = storiesId;
     }
 
-    public String getStoriesArray(){
-        return storiesArray;
+    public String getStoriesId(){
+        return storiesId;
     }
 }

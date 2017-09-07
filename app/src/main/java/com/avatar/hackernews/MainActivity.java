@@ -1,12 +1,12 @@
 package com.avatar.hackernews;
 
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v7.widget.LinearLayoutManager;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -16,22 +16,39 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ListView;
 
+import com.avatar.hackernews.models.TopStories;
+import com.avatar.hackernews.models.TopStoriesId;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
-import com.squareup.okhttp.internal.http.RealResponseBody;
+
+import org.json.JSONArray;
+import org.json.JSONException;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
+import io.realm.Realm;
 import io.realm.RealmResults;
 
-import static com.avatar.hackernews.R.id.textView;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    OkHttpClient client = new OkHttpClient();
+    private OkHttpClient client = new OkHttpClient();
+    private static int id = 1;
+    private FloatingActionButton fabAddPerson;
+    private Realm myRealm;
+    private ListView lvPersonNameList;
+    private static ArrayList<String> topStoriesIdArrayList = new ArrayList<>();
+    private static ArrayList<TopStories> topStoriesArrayList = new ArrayList<>();
+    private StoriesAdapter storiesAdapter;
+    private static MainActivity instance;
+    private AlertDialog.Builder subDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,39 +75,27 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        addFragment();
+        myRealm = Realm.getInstance(Realm.getDefaultConfiguration());
+        instance = this;
+
+        //addFragment();
+        lvPersonNameList = (ListView) findViewById(R.id.stories_list);
+
+        storiesAdapter = new StoriesAdapter(MainActivity.this, topStoriesArrayList);
+        lvPersonNameList.setAdapter(storiesAdapter);
+
     }
 
-    private void addFragment() {
-        ContentFragment fragmentDemo = new ContentFragment();
-        android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
-        android.support.v4.app.FragmentTransaction fragmentTransaction =
-                fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.content_view, fragmentDemo);
-        fragmentTransaction.commit();
-    }
-
-    public void setRealmAdapter(RealmResults<Book> books) {
-
-        RealmBooksAdapter realmAdapter = new RealmBooksAdapter(this.getApplicationContext(), books, true);
-        // Set the data and tell the RecyclerView to draw
-        adapter.setRealmAdapter(realmAdapter);
-        adapter.notifyDataSetChanged();
-    }
-
-    private void setupRecycler() {
-        // use this setting to improve performance if you know that changes
-        // in content do not change the layout size of the RecyclerView
-        recycler.setHasFixedSize(true);
-
-        // use a linear layout manager since the cards are vertically scrollable
-        final LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-        recycler.setLayoutManager(layoutManager);
-
-        // create an empty adapter and add it to the recycler view
-        adapter = new BooksAdapter(this);
-        recycler.setAdapter(adapter);
+    private void updateListView() {
+        RealmResults<TopStories> results = myRealm.where(TopStories.class).findAll();
+        myRealm.beginTransaction();
+        for (int i = 0; i < results.size(); i++) {
+            topStoriesArrayList.add(results.get(i));
+        }
+        if (results.size() > 0)
+            id = myRealm.where(TopStories.class).max("id").intValue() + 1;
+        myRealm.commitTransaction();
+        storiesAdapter.notifyDataSetChanged();
     }
 
 
@@ -103,7 +108,16 @@ public class MainActivity extends AppCompatActivity
             Response response = null;
             try {
                 response = client.newCall(request).execute();
-                System.out.println((response.body()).string());
+                String result = response.body().string();
+                System.out.println(result);
+                try {
+                    JSONArray resultArray = new JSONArray(result);
+                    for (int i = 0; i < resultArray.length(); i++) {
+                        topStoriesIdArrayList.add(resultArray.getString(i));
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
                 return response.toString();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -113,15 +127,28 @@ public class MainActivity extends AppCompatActivity
 
         @Override
         protected void onPostExecute(String result) {
+            if (topStoriesIdArrayList.size() > 0) {
+                for (int i = 0; i < topStoriesIdArrayList.size(); i++) {
+                    addDataToRealmTopStoriesIdList(topStoriesIdArrayList.get(i));
+                }
+            }
         }
+
 
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        insertAndUpdateDb();
+    }
+
+
+    private void insertAndUpdateDb() {
         CreateTopStoryRequest createTopStoryRequest = new CreateTopStoryRequest();
         createTopStoryRequest.execute("https://hacker-news.firebaseio.com/v0/topstories.json?print=pretty");
+
+
     }
 
     @Override
@@ -179,5 +206,103 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+//    public void addOrUpdatePersonDetailsDialog(final TopStories model, final int position) {
+//
+//        //maindialog
+//        LayoutInflater li = LayoutInflater.from(MainActivity.this);
+//
+//        final EditText etAddPersonName = (EditText) promptsView.findViewById(R.id.etAddPersonName);
+//        final EditText etAddPersonEmail = (EditText) promptsView.findViewById(R.id.etAddPersonEmail);
+//        final EditText etAddPersonAddress = (EditText) promptsView.findViewById(R.id.etAddPersonAddress);
+//        final EditText etAddPersonAge = (EditText) promptsView.findViewById(R.id.etAddPersonAge);
+//
+//        if (model != null) {
+//            etAddPersonName.setText(model.getName());
+//            etAddPersonEmail.setText(model.getEmail());
+//            etAddPersonAddress.setText(model.getAddress());
+//            etAddPersonAge.setText(String.valueOf(model.getAge()));
+//        }
+//
+//        mainDialog.setCancelable(false)
+//                .setPositiveButton("Ok", null)
+//                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        dialog.cancel();
+//                    }
+//                });
+//
+//        final AlertDialog dialog = mainDialog.create();
+//        dialog.show();
+//
+//        Button b = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+//        b.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                if (!Utility.isBlankField(etAddPersonName) && !Utility.isBlankField(etAddPersonEmail) && !Utility.isBlankField(etAddPersonAddress) && !Utility.isBlankField(etAddPersonAge)) {
+//                    PersonDetailsModel personDetailsModel = new PersonDetailsModel();
+//                    personDetailsModel.setName(etAddPersonName.getText().toString());
+//                    personDetailsModel.setEmail(etAddPersonEmail.getText().toString());
+//                    personDetailsModel.setAddress(etAddPersonAddress.getText().toString());
+//                    personDetailsModel.setAge(Integer.parseInt(etAddPersonAge.getText().toString()));
+//
+//                    if (model == null)
+//                        addDataToRealm(personDetailsModel);
+//                    else
+//                        updatePersonDetails(personDetailsModel, position, model.getId());
+//
+//                    dialog.cancel();
+//                } else {
+//                    subDialog.show();
+//                }
+//            }
+//        });
+//    }
+
+    private void addDataToRealmTopStories(TopStories model) {
+        myRealm.beginTransaction();
+        topStoriesArrayList.add(model);
+        myRealm.commitTransaction();
+        storiesAdapter.notifyDataSetChanged();
+    }
+
+    private void addDataToRealmTopStoriesIdList(String id) {
+        myRealm.beginTransaction();
+        TopStoriesId topStoriesId = new TopStoriesId();
+        topStoriesId.setStoriesId(id);
+        myRealm.commitTransaction();
+        storiesAdapter.notifyDataSetChanged();
+    }
+
+//    public PersonDetailsModel searchPerson(int personId) {
+//        RealmResults<PersonDetailsModel> results = myRealm.where(PersonDetailsModel.class).equalTo("id", personId).findAll();
+//
+//        myRealm.beginTransaction();
+//        myRealm.commitTransaction();
+//
+//        return results.get(0);
+//    }
+//
+//    public void updatePersonDetails(PersonDetailsModel model, int position, int personID) {
+//        PersonDetailsModel editPersonDetails = myRealm.where(PersonDetailsModel.class).equalTo("id", personID).findFirst();
+//        myRealm.beginTransaction();
+//        editPersonDetails.setName(model.getName());
+//        editPersonDetails.setEmail(model.getEmail());
+//        editPersonDetails.setAddress(model.getAddress());
+//        editPersonDetails.setAge(model.getAge());
+//        myRealm.commitTransaction();
+//
+//        personDetailsModelArrayList.set(position, editPersonDetails);
+//        personDetailsAdapter.notifyDataSetChanged();
+//    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        topStoriesIdArrayList.clear();
+        topStoriesArrayList.clear();
+        myRealm.close();
     }
 }

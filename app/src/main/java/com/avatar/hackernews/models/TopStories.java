@@ -23,6 +23,8 @@ public class TopStories extends RealmObject {
 
     private int score;
 
+    private String url;
+
     @Required
     private String time;
 
@@ -30,6 +32,11 @@ public class TopStories extends RealmObject {
     private String type;
 
     private int descendants;
+
+    private int commentCount;
+
+    @Required
+    private String username;
 
     public String getId() {
         return id;
@@ -101,6 +108,30 @@ public class TopStories extends RealmObject {
 
     public void setDescendants(int descendants) {
         this.descendants = descendants;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public int getCommentCount() {
+        return commentCount;
+    }
+
+    public void setCommentCount(int commentCount) {
+        this.commentCount = commentCount;
     }
 
 

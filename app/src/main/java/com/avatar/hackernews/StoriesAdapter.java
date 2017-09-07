@@ -66,7 +66,6 @@ public class StoriesAdapter extends BaseAdapter {
         holder.url.setText(storiesArrayList.get(position).getUrl());
         holder.time.setText(storiesArrayList.get(position).getTime());
         holder.username.setText(storiesArrayList.get(position).getUsername());
-        holder.comment_count.setText(storiesArrayList.get(position).getCommentCount());
 
 //        holder.setOnClickListener(new View.OnClickListener() {
 //            @Override

@@ -19,9 +19,7 @@ public class TopStories extends RealmObject {
 
     private String kids;
 
-    private String parts;
-
-    private int score;
+    private String score;
 
     private String url;
 
@@ -30,10 +28,6 @@ public class TopStories extends RealmObject {
 
     @Required
     private String type;
-
-    private int descendants;
-
-    private int commentCount;
 
     @Required
     private String username;
@@ -70,19 +64,11 @@ public class TopStories extends RealmObject {
         this.kids = kids;
     }
 
-    public String getParts() {
-        return parts;
-    }
-
-    public void setParts(String parts) {
-        this.parts = parts;
-    }
-
-    public int getScore() {
+    public String getScore() {
         return score;
     }
 
-    public void setSCore(int id) {
+    public void setScore(String score) {
         this.score = score;
     }
 
@@ -102,13 +88,6 @@ public class TopStories extends RealmObject {
         this.type = type;
     }
 
-    public int getDescendents() {
-        return descendants;
-    }
-
-    public void setDescendants(int descendants) {
-        this.descendants = descendants;
-    }
 
     public String getUrl() {
         return url;
@@ -124,14 +103,6 @@ public class TopStories extends RealmObject {
 
     public void setUsername(String username) {
         this.username = username;
-    }
-
-    public int getCommentCount() {
-        return commentCount;
-    }
-
-    public void setCommentCount(int commentCount) {
-        this.commentCount = commentCount;
     }
 
 

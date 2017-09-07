@@ -1,6 +1,7 @@
 package com.avatar.hackernews;
 
 import android.content.Context;
+import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -64,7 +65,7 @@ public class StoriesAdapter extends BaseAdapter {
         holder.likes.setText(storiesArrayList.get(position).getScore());
         holder.title.setText(storiesArrayList.get(position).getTitle());
         holder.url.setText(storiesArrayList.get(position).getUrl());
-        holder.time.setText(storiesArrayList.get(position).getTime());
+        holder.time.setText(DateUtils.getRelativeTimeSpanString(Long.parseLong(storiesArrayList.get(position).getTime())*1000,System.currentTimeMillis(),0L));
         holder.username.setText(storiesArrayList.get(position).getUsername());
 
 //        holder.setOnClickListener(new View.OnClickListener() {

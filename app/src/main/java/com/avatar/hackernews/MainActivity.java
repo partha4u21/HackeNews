@@ -41,7 +41,6 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private OkHttpClient client = new OkHttpClient();
-    private static int id = 1;
     private FloatingActionButton fabAddPerson;
     private Realm myRealm;
     private ListView lvPersonNameList;
@@ -84,6 +83,7 @@ public class MainActivity extends AppCompatActivity
 
         storiesAdapter = new StoriesAdapter(MainActivity.this, topStoriesArrayList);
         lvPersonNameList.setAdapter(storiesAdapter);
+        updateListView();
 
     }
 
@@ -93,48 +93,8 @@ public class MainActivity extends AppCompatActivity
         for (int i = 0; i < results.size(); i++) {
             topStoriesArrayList.add(results.get(i));
         }
-        if (results.size() > 0)
-            id = myRealm.where(TopStories.class).max("id").intValue() + 1;
         myRealm.commitTransaction();
         storiesAdapter.notifyDataSetChanged();
-    }
-
-
-    private class CreateTopStoryRequest extends AsyncTask<String, Void, String> {
-        @Override
-        protected String doInBackground(String... urls) {
-            Request request = new Request.Builder()
-                    .url(urls[0])
-                    .build();
-            Response response = null;
-            try {
-                response = client.newCall(request).execute();
-                String result = response.body().string();
-                System.out.println(result);
-                try {
-                    JSONArray resultArray = new JSONArray(result);
-                    for (int i = 0; i < resultArray.length(); i++) {
-                        topStoriesIdArrayList.add(resultArray.getString(i));
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                return response.toString();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return "Download failed";
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            if (topStoriesIdArrayList.size() > 0) {
-                for (int i = 0; i < topStoriesIdArrayList.size(); i++) {
-                    addDataToRealmTopStoriesIdList(topStoriesIdArrayList.get(i));
-                }
-                startService();
-            }
-        }
     }
 
     public void startService() {
@@ -149,13 +109,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
-        insertAndUpdateDb();
-    }
-
-
-    private void insertAndUpdateDb() {
-        CreateTopStoryRequest createTopStoryRequest = new CreateTopStoryRequest();
-        createTopStoryRequest.execute("https://hacker-news.firebaseio.com/v0/topstories.json?print=pretty");
+        startService();
     }
 
     @Override
@@ -215,20 +169,7 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    private void addDataToRealmTopStories(TopStories model) {
-        myRealm.beginTransaction();
-        topStoriesArrayList.add(model);
-        myRealm.commitTransaction();
-        storiesAdapter.notifyDataSetChanged();
-    }
 
-    private void addDataToRealmTopStoriesIdList(String id) {
-        myRealm.beginTransaction();
-        TopStoriesId topStoriesId = myRealm.createObject(TopStoriesId.class);
-        topStoriesId.setStoriesId(id);
-        myRealm.commitTransaction();
-        storiesAdapter.notifyDataSetChanged();
-    }
 
     @Override
     protected void onDestroy() {

@@ -42,6 +42,7 @@ public class TopStoriesFetchService extends Service {
         // Let it continue running until it is stopped.
         Toast.makeText(this, "Service Started", Toast.LENGTH_LONG).show();
         realm = Realm.getInstance(Realm.getDefaultConfiguration());
+        insertAndUpdateDb();
         addStories();
         return START_STICKY;
     }
@@ -76,19 +77,24 @@ public class TopStoriesFetchService extends Service {
                     JSONObject result = new JSONObject(response.body().string());
                     Realm realm = Realm.getInstance(Realm.getDefaultConfiguration());
                     realm.beginTransaction();
-                    TopStories topStoriesId = realm.createObject(TopStories.class);
-                    topStoriesId.setId(String.valueOf(result.getInt("id")));
-                    topStoriesId.setTitle(result.getString("title"));
-                    topStoriesId.setParent(result.optString("parent", ""));
-                    topStoriesId.setKids(result.optJSONArray("kids") != null ? result.optJSONArray("kids").toString() : new JSONArray().toString());
-                    topStoriesId.setScore(result.optString("score",""));
-                    topStoriesId.setUrl(result.optString("url", ""));
-                    topStoriesId.setTime(result.getString("time"));
-                    topStoriesId.setType(result.getString("type"));
-                    topStoriesId.setUsername(result.getString("by"));
-                    realm.commitTransaction();
+                    String id = String.valueOf(result.getInt("id"));
+
+                    TopStories wisdom = realm.where(TopStories.class).equalTo("id", id).findFirst();
+                    if (wisdom == null) {
+                        TopStories topStoriesId = realm.createObject(TopStories.class);
+                        topStoriesId.setId(String.valueOf(result.getInt("id")));
+                        topStoriesId.setTitle(result.getString("title"));
+                        topStoriesId.setParent(result.optString("parent", ""));
+                        topStoriesId.setKids(result.optJSONArray("kids") != null ? result.optJSONArray("kids").toString() : new JSONArray().toString());
+                        topStoriesId.setScore(result.optString("score", ""));
+                        topStoriesId.setUrl(result.optString("url", ""));
+                        topStoriesId.setTime(result.getString("time"));
+                        topStoriesId.setType(result.getString("type"));
+                        topStoriesId.setUsername(result.getString("by"));
+                        realm.commitTransaction();
+                        System.out.println(urls[0] + "added");
+                    }
                     realm.close();
-                    System.out.println(urls[0] + "added");
                     return response.toString();
                 }
             } catch (IOException e) {
@@ -104,6 +110,51 @@ public class TopStoriesFetchService extends Service {
         protected void onPostExecute(String result) {
             System.out.println("Insert complete");
         }
+    }
+
+    private class CreateTopStoryIdRequest extends AsyncTask<String, Void, String> {
+        @Override
+        protected String doInBackground(String... urls) {
+            Request request = new Request.Builder()
+                    .url(urls[0])
+                    .build();
+            Response response = null;
+            try {
+                response = client.newCall(request).execute();
+                String result = response.body().string();
+                System.out.println(result);
+                try {
+                    JSONArray resultArray = new JSONArray(result);
+                    for (int i = 0; i < resultArray.length(); i++) {
+                        addDataToRealmTopStoriesIdList(resultArray.getString(i));
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                return response.toString();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return "Download failed";
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+        }
+    }
+
+    private void insertAndUpdateDb() {
+        CreateTopStoryIdRequest createTopStoryIdRequest = new CreateTopStoryIdRequest();
+        createTopStoryIdRequest.execute("https://hacker-news.firebaseio.com/v0/topstories.json?print=pretty");
+    }
+
+    private void addDataToRealmTopStoriesIdList(String id) {
+        Realm realm = Realm.getInstance(Realm.getDefaultConfiguration());
+        realm.beginTransaction();
+        TopStoriesId topStoriesId = realm.createObject(TopStoriesId.class);
+        topStoriesId.setStoriesId(id);
+        realm.commitTransaction();
+        realm.close();
     }
 
 

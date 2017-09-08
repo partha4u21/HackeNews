@@ -5,4 +5,11 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_settings">Settings</string>
+
+    <string name="loading">Loading…</string>
+    <string name="log_error_occurred">"Error occurred: "</string>
+    <string name="drawer_open">Open</string>
+    <string name="drawer_close">Close</string>
+
+    <string name="web_client_id">983980843599-j3ino2mv5j9krh7m95e9doimda1j10q6.apps.googleusercontent.com</string>
 </resources>

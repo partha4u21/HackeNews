@@ -76,7 +76,7 @@ public class Login extends FragmentActivity implements GoogleApiClient.Connectio
         mAuth = com.google.firebase.auth.FirebaseAuth.getInstance();
 
         //this is where we start the Auth state Listener to listen for whether the user is signed in or not
-        mAuthListener = new FirebaseAuth.AuthStateListener(){
+        mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 // Get signedIn user
@@ -98,7 +98,7 @@ public class Login extends FragmentActivity implements GoogleApiClient.Connectio
     //This method creates a new user on our own Firebase database
     //after a successful Authentication on Firebase
     //It also saves the user info to SharedPreference
-    private void createUserInFirebaseHelper(){
+    private void createUserInFirebaseHelper() {
 
         //Since Firebase does not allow "." in the key name, we'll have to encode and change the "." to ","
         // using the encodeEmail method in class Utils
@@ -111,7 +111,7 @@ public class Login extends FragmentActivity implements GoogleApiClient.Connectio
         userLocation.addListenerForSingleValueEvent(new com.firebase.client.ValueEventListener() {
             @Override
             public void onDataChange(com.firebase.client.DataSnapshot dataSnapshot) {
-                if (dataSnapshot.getValue() == null){
+                if (dataSnapshot.getValue() == null) {
                     /* Set raw version of date to the ServerValue.TIMESTAMP value and save into dateCreatedMap */
                     HashMap<String, Object> timestampJoined = new HashMap<>();
                     timestampJoined.put(FIREBASE_PROPERTY_TIMESTAMP, ServerValue.TIMESTAMP);
@@ -121,12 +121,10 @@ public class Login extends FragmentActivity implements GoogleApiClient.Connectio
                     userLocation.setValue(newUser);
 
                     Toast.makeText(Login.this, "Account created!", Toast.LENGTH_SHORT).show();
-
-                    // After saving data to Firebase, goto next activity
-//                    Intent intent = new Intent(MainActivity.this, NavDrawerActivity.class);
-//                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//                    startActivity(intent);
-//                    finish();
+                    Intent intent = new Intent(Login.this, MainActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                    finish();
                 }
             }
 
@@ -135,9 +133,8 @@ public class Login extends FragmentActivity implements GoogleApiClient.Connectio
 
                 Log.d(TAG, getString(R.string.log_error_occurred) + firebaseError.getMessage());
                 //hideProgressDialog();
-                if (firebaseError.getCode() == FirebaseError.EMAIL_TAKEN){
-                }
-                else {
+                if (firebaseError.getCode() == FirebaseError.EMAIL_TAKEN) {
+                } else {
                     Toast.makeText(Login.this, firebaseError.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             }
@@ -145,7 +142,7 @@ public class Login extends FragmentActivity implements GoogleApiClient.Connectio
     }
 
     // This method configures Google SignIn
-    public void configureSignIn(){
+    public void configureSignIn() {
 // Configure sign-in to request the user's basic profile like name and email
         GoogleSignInOptions options = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(Login.this.getResources().getString(R.string.web_client_id))
@@ -211,7 +208,7 @@ public class Login extends FragmentActivity implements GoogleApiClient.Connectio
     }
 
     //After a successful sign into Google, this method now authenticates the user with Firebase
-    private void firebaseAuthWithGoogle(AuthCredential credential){
+    private void firebaseAuthWithGoogle(AuthCredential credential) {
         showProgressDialog();
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -223,7 +220,7 @@ public class Login extends FragmentActivity implements GoogleApiClient.Connectio
                             task.getException().printStackTrace();
                             Toast.makeText(Login.this, "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
-                        }else {
+                        } else {
                             createUserInFirebaseHelper();
                             Toast.makeText(Login.this, "Login successful",
                                     Toast.LENGTH_SHORT).show();
@@ -240,7 +237,7 @@ public class Login extends FragmentActivity implements GoogleApiClient.Connectio
     @Override
     protected void onStart() {
         super.onStart();
-        if (mAuthListener != null){
+        if (mAuthListener != null) {
             FirebaseAuth.getInstance().signOut();
         }
         mAuth.addAuthStateListener(mAuthListener);
@@ -250,7 +247,7 @@ public class Login extends FragmentActivity implements GoogleApiClient.Connectio
     protected void onStop() {
         super.onStop();
         hideProgressDialog();
-        if (mAuthListener != null){
+        if (mAuthListener != null) {
             mAuth.removeAuthStateListener(mAuthListener);
         }
     }
@@ -271,10 +268,10 @@ public class Login extends FragmentActivity implements GoogleApiClient.Connectio
         Utils utils = new Utils(this);
         int id = view.getId();
 
-        if (id == R.id.login_with_google){
-            if (utils.isNetworkAvailable()){
+        if (id == R.id.login_with_google) {
+            if (utils.isNetworkAvailable()) {
                 signIn();
-            }else {
+            } else {
                 Toast.makeText(Login.this, "Oops! no internet connection!", Toast.LENGTH_SHORT).show();
             }
         }

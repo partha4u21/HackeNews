@@ -2,6 +2,7 @@ package com.piper.hackernews;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -65,13 +66,19 @@ public class StoriesAdapter extends BaseAdapter {
         holder.likes.setText(storiesArrayList.get(position).getScore());
         holder.title.setText(storiesArrayList.get(position).getTitle());
         holder.url.setText(storiesArrayList.get(position).getUrl());
-        holder.time.setText(DateUtils.getRelativeTimeSpanString(Long.parseLong(storiesArrayList.get(position).getTime())*1000,System.currentTimeMillis(),0L));
+        final String time = (String) DateUtils.getRelativeTimeSpanString(Long.parseLong(storiesArrayList.get(position).getTime()) * 1000, System.currentTimeMillis(), 0L);
+        holder.time.setText(time);
         holder.username.setText(storiesArrayList.get(position).getUsername());
 
         v.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(v.getContext(),StoriesDetailActivty.class);
+                Intent intent = new Intent(v.getContext(), StoriesDetailActivty.class);
+                intent.putExtra("title", storiesArrayList.get(position).getTitle());
+                intent.putExtra("url", storiesArrayList.get(position).getUrl());
+                intent.putExtra("time", time);
+                intent.putExtra("username", storiesArrayList.get(position).getUsername());
+                intent.putExtra("comments_id", storiesArrayList.get(position).getKids());
                 v.getContext().startActivity(intent);
             }
         });
@@ -79,6 +86,6 @@ public class StoriesAdapter extends BaseAdapter {
     }
 
     class Holder {
-        TextView likes,title,url,time,username,comment_count;
+        TextView likes, title, url, time, username, comment_count;
     }
 }

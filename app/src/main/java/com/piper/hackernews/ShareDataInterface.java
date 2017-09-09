@@ -7,7 +7,7 @@ import org.json.JSONArray;
  */
 
 public interface ShareDataInterface {
-    public JSONArray getComments();
+    public String getID();
 
     public String getUrl();
 }

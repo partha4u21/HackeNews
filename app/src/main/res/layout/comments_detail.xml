@@ -5,7 +5,7 @@
     android:orientation="vertical">
 
     <ListView
-        android:id="@+id/stories_list"
+        android:id="@+id/comments_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 

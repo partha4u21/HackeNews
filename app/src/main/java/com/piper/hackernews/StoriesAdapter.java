@@ -75,6 +75,7 @@ public class StoriesAdapter extends BaseAdapter {
             public void onClick(View v) {
                 Intent intent = new Intent(v.getContext(), StoriesDetailActivty.class);
                 intent.putExtra("title", storiesArrayList.get(position).getTitle());
+                intent.putExtra("id", storiesArrayList.get(position).getId());
                 intent.putExtra("url", storiesArrayList.get(position).getUrl());
                 intent.putExtra("time", time);
                 intent.putExtra("username", storiesArrayList.get(position).getUsername());

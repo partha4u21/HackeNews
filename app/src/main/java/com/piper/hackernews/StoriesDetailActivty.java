@@ -56,8 +56,8 @@ public class StoriesDetailActivty extends FragmentActivity implements ShareDataI
     }
 
     @Override
-    public JSONArray getComments() {
-        return comments;
+    public String getID() {
+        return getIntent().getStringExtra("id");
     }
 
     @Override

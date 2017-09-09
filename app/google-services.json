@@ -1,35 +1,35 @@
 {
   "project_info": {
-    "project_number": "1041800324208",
-    "firebase_url": "https://hackernews-a3f04.firebaseio.com",
-    "project_id": "hackernews-a3f04",
-    "storage_bucket": "hackernews-a3f04.appspot.com"
+    "project_number": "294001668310",
+    "firebase_url": "https://hackernews-ee435.firebaseio.com",
+    "project_id": "hackernews-ee435",
+    "storage_bucket": "hackernews-ee435.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1041800324208:android:702d25e60988b0aa",
+        "mobilesdk_app_id": "1:294001668310:android:2829bc3b244bae12",
         "android_client_info": {
-          "package_name": "com.avatar.hackernews"
+          "package_name": "com.piper.hackernews"
         }
       },
       "oauth_client": [
         {
-          "client_id": "1041800324208-jtsbpjgb3s559bn9o4v58j84p1l5asu7.apps.googleusercontent.com",
+          "client_id": "294001668310-4v8mj021r048htao99io60f6m83ja9ia.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.avatar.hackernews",
+            "package_name": "com.piper.hackernews",
             "certificate_hash": "929cd8f0cc0bc2e2f793434003e5f7da16e0fd67"
           }
         },
         {
-          "client_id": "1041800324208-p1l4m2c45qsf7l1nq3m1v3bm4sgtq8qo.apps.googleusercontent.com",
+          "client_id": "294001668310-t2lm92mfans3pi16hro2ddidiuj93g6l.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyA4JKaKtumgNd579GQHP6OavaHoUNAJpbQ"
+          "current_key": "AIzaSyDs_pcDxhu_66I_ojYNyIlWQMAZupUyep0"
         }
       ],
       "services": {
@@ -40,7 +40,7 @@
           "status": 2,
           "other_platform_oauth_client": [
             {
-              "client_id": "1041800324208-p1l4m2c45qsf7l1nq3m1v3bm4sgtq8qo.apps.googleusercontent.com",
+              "client_id": "294001668310-t2lm92mfans3pi16hro2ddidiuj93g6l.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

@@ -1,4 +1,4 @@
-package com.avatar.hackernews;
+package com.piper.hackernews;
 
 import android.content.Context;
 import android.text.format.DateUtils;
@@ -6,10 +6,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.avatar.hackernews.models.TopStories;
+import com.piper.hackernews.models.TopStories;
 
 import java.util.ArrayList;
 
@@ -68,13 +67,12 @@ public class StoriesAdapter extends BaseAdapter {
         holder.time.setText(DateUtils.getRelativeTimeSpanString(Long.parseLong(storiesArrayList.get(position).getTime())*1000,System.currentTimeMillis(),0L));
         holder.username.setText(storiesArrayList.get(position).getUsername());
 
-//        holder.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                PersonDetailsModel dataToEditModel = MainActivity.getInstance().searchPerson(storiesArrayList.get(position).getId());
-//                MainActivity.getInstance().addOrUpdatePersonDetailsDialog(dataToEditModel, position);
-//            }
-//        });
+        v.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                System.out.println("clicked");
+            }
+        });
         return v;
     }
 

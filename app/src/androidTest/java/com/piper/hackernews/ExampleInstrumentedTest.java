@@ -1,4 +1,4 @@
-package com.avatar.hackernews;
+package com.piper.hackernews;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("com.avatar.hackernews", appContext.getPackageName());
+        assertEquals("com.piper.hackernews", appContext.getPackageName());
     }
 }

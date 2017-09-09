@@ -1,11 +1,11 @@
-package com.avatar.hackernews;
+package com.piper.hackernews;
 
 import android.app.Activity;
 import android.app.Application;
 import android.support.v4.app.Fragment;
 
-import com.avatar.hackernews.models.TopStories;
-import com.avatar.hackernews.models.TopStoriesId;
+import com.piper.hackernews.models.TopStories;
+import com.piper.hackernews.models.TopStoriesId;
 
 import io.realm.Realm;
 import io.realm.RealmResults;

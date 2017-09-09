@@ -1,11 +1,17 @@
 apply plugin: 'com.android.application'
 apply plugin: 'realm-android'
 
+repositories {
+    maven {
+        url 'https://maven.google.com'
+    }
+}
+
 android {
     compileSdkVersion 26
-    buildToolsVersion "26.0.1"
+    buildToolsVersion "26.0.0"
     defaultConfig {
-        applicationId "com.avatar.hackernews"
+        applicationId "com.piper.hackernews"
         minSdkVersion 14
         targetSdkVersion 26
         versionCode 1
@@ -34,14 +40,14 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.android.support:appcompat-v7:26.0.2'
-    compile 'com.android.support:design:26.+'
+    compile 'com.android.support:appcompat-v7:26.0.'
+    compile 'com.android.support:design:26.0.0'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     compile 'com.google.firebase:firebase-auth:10.0.1'
     compile 'com.squareup.okhttp:okhttp:2.5.0'
     compile 'io.realm:android-adapters:2.1.0'
-    compile 'com.android.support:recyclerview-v7:26.0.2'
-    compile 'com.android.support:cardview-v7:26.0.2'
+    compile 'com.android.support:recyclerview-v7:26.0.0'
+    compile 'com.android.support:cardview-v7:26.0.0'
     compile 'com.google.android.gms:play-services-auth:10.0.1'
     compile 'com.firebase:firebase-client-android:2.5.2+'
 }

@@ -1,4 +1,4 @@
-package com.avatar.hackernews;
+package com.piper.hackernews;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -12,7 +12,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-import com.avatar.hackernews.models.User;
+import com.piper.hackernews.models.User;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ServerValue;
 import com.google.android.gms.auth.api.Auth;
@@ -44,18 +44,17 @@ public class Login extends FragmentActivity implements GoogleApiClient.Connectio
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private static final int RC_SIGN_IN = 9001;
-    private static final String TAG = "MainActivity";
+    private static final String TAG = "LoginActivty";
     private String idToken;
     public SharedPrefManager sharedPrefManager;
     private final Context mContext = this;
-    public ProgressDialog mProgressDialog;
 
     private String name, email;
     private String photo;
     private Uri photoUri;
     private SignInButton mSignInButton;
 
-    public static final String FIREBASE_URL = "INCLUDE YOUR FIREBASE URL HERE";
+    public static final String FIREBASE_URL = "https://hackernews-ee435.firebaseio.com";
     public static final String FIREBASE_LOCATION_USERS = "users";
     public static final String FIREBASE_URL_USERS = FIREBASE_URL + "/" + FIREBASE_LOCATION_USERS;
     public static final String FIREBASE_PROPERTY_TIMESTAMP = "timestamp";
@@ -64,7 +63,7 @@ public class Login extends FragmentActivity implements GoogleApiClient.Connectio
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Firebase.setAndroidContext(this);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.login_layout);
 
         mSignInButton = (SignInButton) findViewById(R.id.login_with_google);
         mSignInButton.setSize(SignInButton.SIZE_WIDE);
@@ -201,15 +200,19 @@ public class Login extends FragmentActivity implements GoogleApiClient.Connectio
             } else {
                 // Google Sign In failed, update UI appropriately
                 Log.e(TAG, "Login Unsuccessful. ");
-                Toast.makeText(this, "Login Unsuccessful", Toast.LENGTH_SHORT)
-                        .show();
+                Toast.makeText(this, "Login Unsuccessful", Toast.LENGTH_SHORT).show();
+
+                Intent intent = new Intent(Login.this, MainActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                finish();
             }
         }
     }
 
     //After a successful sign into Google, this method now authenticates the user with Firebase
     private void firebaseAuthWithGoogle(AuthCredential credential) {
-        showProgressDialog();
+        Utils.showProgressDialog(this);
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
@@ -229,7 +232,7 @@ public class Login extends FragmentActivity implements GoogleApiClient.Connectio
                             startActivity(intent);
                             finish();
                         }
-                        hideProgressDialog();
+                        Utils.hideProgressDialog();
                     }
                 });
     }
@@ -246,7 +249,7 @@ public class Login extends FragmentActivity implements GoogleApiClient.Connectio
     @Override
     protected void onStop() {
         super.onStop();
-        hideProgressDialog();
+        Utils.hideProgressDialog();
         if (mAuthListener != null) {
             mAuth.removeAuthStateListener(mAuthListener);
         }
@@ -282,20 +285,5 @@ public class Login extends FragmentActivity implements GoogleApiClient.Connectio
 
     }
 
-    public void showProgressDialog() {
-        if (mProgressDialog == null) {
-            mProgressDialog = new ProgressDialog(this);
-            mProgressDialog.setMessage(getString(R.string.loading));
-            mProgressDialog.setIndeterminate(true);
-        }
-
-        mProgressDialog.show();
-    }
-
-    public void hideProgressDialog() {
-        if (mProgressDialog != null && mProgressDialog.isShowing()) {
-            mProgressDialog.dismiss();
-        }
-    }
 
 }

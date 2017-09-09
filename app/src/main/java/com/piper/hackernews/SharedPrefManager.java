@@ -1,4 +1,4 @@
-package com.avatar.hackernews;
+package com.piper.hackernews;
 
 import android.content.Context;
 import android.content.SharedPreferences;

@@ -1,13 +1,17 @@
-package com.avatar.hackernews;
+package com.piper.hackernews;
 
 import android.app.AlertDialog;
-import android.content.DialogInterface;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.IBinder;
+import android.os.Message;
+import android.os.Messenger;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -17,20 +21,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ListView;
 
-import com.avatar.hackernews.models.TopStories;
-import com.avatar.hackernews.models.TopStoriesId;
+import com.piper.hackernews.models.TopStories;
 import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-
-import java.io.IOException;
 import java.util.ArrayList;
 
 import io.realm.Realm;
@@ -38,7 +33,7 @@ import io.realm.RealmResults;
 
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, ServiceCallback {
 
     private OkHttpClient client = new OkHttpClient();
     private FloatingActionButton fabAddPerson;
@@ -49,6 +44,8 @@ public class MainActivity extends AppCompatActivity
     private StoriesAdapter storiesAdapter;
     private static MainActivity instance;
     private AlertDialog.Builder subDialog;
+    private TopStoriesFetchService fetchService;
+    boolean bound = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,6 +85,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void updateListView() {
+        Realm myRealm = Realm.getInstance(Realm.getDefaultConfiguration());
         RealmResults<TopStories> results = myRealm.where(TopStories.class).findAll();
         myRealm.beginTransaction();
         for (int i = 0; i < results.size(); i++) {
@@ -99,17 +97,48 @@ public class MainActivity extends AppCompatActivity
 
     public void startService() {
         startService(new Intent(getBaseContext(), TopStoriesFetchService.class));
+        Intent intent = new Intent(this, TopStoriesFetchService.class);
+        Messenger messenger = new Messenger(myHandler);
+        intent.putExtra("MESSENGER", messenger);
+        bindService(intent, mServerConn, Context.BIND_AUTO_CREATE);
+        bound = true;
     }
+
+    public Handler myHandler = new Handler() {
+        public void handleMessage(Message message) {
+            Bundle data = message.getData();
+        }
+    };
 
     // Method to stop the service
     public void stopService() {
         stopService(new Intent(getBaseContext(), TopStoriesFetchService.class));
+        unbindService(mServerConn);
+        storiesAdapter.notifyDataSetChanged();
+        bound = false;
     }
+
+    protected ServiceConnection mServerConn = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder binder) {
+            TopStoriesFetchService.LocalBinder localBinder = (TopStoriesFetchService.LocalBinder)binder;
+            fetchService = localBinder.getService();
+            bound = true;
+            fetchService.setCallbacks(MainActivity.this);
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            bound = false;
+            updateAdapter();
+        }
+    };
 
     @Override
     protected void onResume() {
         super.onResume();
         startService();
+
     }
 
     @Override
@@ -170,7 +199,6 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -178,5 +206,17 @@ public class MainActivity extends AppCompatActivity
         topStoriesArrayList.clear();
         myRealm.close();
         stopService();
+    }
+
+    @Override
+    public void updateAdapter() {
+        runOnUiThread(new  Runnable()
+        {
+            public void run()
+            {
+                updateListView();
+            }
+        });
+
     }
 }

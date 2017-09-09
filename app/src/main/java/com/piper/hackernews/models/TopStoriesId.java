@@ -1,8 +1,4 @@
-package com.avatar.hackernews.models;
-
-import android.content.pm.InstrumentationInfo;
-
-import org.json.JSONArray;
+package com.piper.hackernews.models;
 
 import io.realm.RealmObject;
 import io.realm.annotations.Required;

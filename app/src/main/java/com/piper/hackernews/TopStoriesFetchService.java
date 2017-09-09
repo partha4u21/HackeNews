@@ -1,14 +1,15 @@
-package com.avatar.hackernews;
+package com.piper.hackernews;
 
 import android.app.Service;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.Binder;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.widget.Toast;
 
-import com.avatar.hackernews.models.TopStories;
-import com.avatar.hackernews.models.TopStoriesId;
+import com.piper.hackernews.models.TopStories;
+import com.piper.hackernews.models.TopStoriesId;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
@@ -30,11 +31,19 @@ public class TopStoriesFetchService extends Service {
 
     Realm realm = null;
     private OkHttpClient client = new OkHttpClient();
+    ServiceCallback callback;
+    private final LocalBinder mLocalBinder = new LocalBinder();
+
+    public class LocalBinder extends Binder {
+        public TopStoriesFetchService getService() {
+            return TopStoriesFetchService.this;
+        }
+    }
 
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
+        return mLocalBinder;
     }
 
     @Override
@@ -43,11 +52,11 @@ public class TopStoriesFetchService extends Service {
         Toast.makeText(this, "Service Started", Toast.LENGTH_LONG).show();
         realm = Realm.getInstance(Realm.getDefaultConfiguration());
         insertAndUpdateDb();
-        addStories();
         return START_STICKY;
     }
 
     private void addStories() {
+        realm = Realm.getInstance(Realm.getDefaultConfiguration());
         RealmResults<TopStoriesId> results = realm.where(TopStoriesId.class).findAll();
         realm.beginTransaction();
 
@@ -108,6 +117,9 @@ public class TopStoriesFetchService extends Service {
 
         @Override
         protected void onPostExecute(String result) {
+            if (callback != null) {
+                callback.updateAdapter();
+            }
             System.out.println("Insert complete");
         }
     }
@@ -140,6 +152,7 @@ public class TopStoriesFetchService extends Service {
 
         @Override
         protected void onPostExecute(String result) {
+            addStories();
         }
     }
 
@@ -155,6 +168,10 @@ public class TopStoriesFetchService extends Service {
         topStoriesId.setStoriesId(id);
         realm.commitTransaction();
         realm.close();
+    }
+
+    public void setCallbacks(ServiceCallback callbacks) {
+        callback = callbacks;
     }
 
 

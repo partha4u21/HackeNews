@@ -1,4 +1,4 @@
-package com.avatar.hackernews.models;
+package com.piper.hackernews.models;
 
 import java.util.HashMap;
 

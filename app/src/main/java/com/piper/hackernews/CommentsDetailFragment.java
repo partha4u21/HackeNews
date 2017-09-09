@@ -111,7 +111,6 @@ public class CommentsDetailFragment extends Fragment {
                         commentsArrayList.add(comments);
                         System.out.println(urls[0] + "added");
                     }
-                    realm.close();
                     return response.toString();
                 }
             } catch (IOException e) {

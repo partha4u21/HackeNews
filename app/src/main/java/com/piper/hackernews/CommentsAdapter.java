@@ -50,7 +50,7 @@ public class CommentsAdapter extends BaseAdapter {
         View v = convertView;
         CommentsAdapter.Holder holder;
         if (v == null) {
-            v = inflater.inflate(R.layout.stories_item, null);
+            v = inflater.inflate(R.layout.comments_item, null);
             holder = new CommentsAdapter.Holder();
             holder.time = (TextView) v.findViewById(R.id.time);
             holder.comment = (TextView) v.findViewById(R.id.comment);

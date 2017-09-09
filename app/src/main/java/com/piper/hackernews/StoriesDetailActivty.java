@@ -47,7 +47,7 @@ public class StoriesDetailActivty extends FragmentActivity implements ShareDataI
         title.setText(getIntent().getStringExtra("title"));
         url.setText(getIntent().getStringExtra("url"));
         time.setText(getIntent().getStringExtra("time"));
-        title.setText(getIntent().getStringExtra("username"));
+        userName.setText(getIntent().getStringExtra("username"));
         try {
             comments = new JSONArray(getIntent().getStringExtra("comments_id"));
         } catch (JSONException e) {

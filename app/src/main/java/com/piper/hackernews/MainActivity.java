@@ -36,7 +36,6 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, ServiceCallback {
 
     private OkHttpClient client = new OkHttpClient();
-    private FloatingActionButton fabAddPerson;
     private Realm myRealm;
     private ListView lvPersonNameList;
     private static ArrayList<String> topStoriesIdArrayList = new ArrayList<>();
@@ -53,15 +52,6 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -88,6 +78,7 @@ public class MainActivity extends AppCompatActivity
         Realm myRealm = Realm.getInstance(Realm.getDefaultConfiguration());
         RealmResults<TopStories> results = myRealm.where(TopStories.class).findAll();
         myRealm.beginTransaction();
+        topStoriesArrayList.clear();
         for (int i = 0; i < results.size(); i++) {
             topStoriesArrayList.add(results.get(i));
         }

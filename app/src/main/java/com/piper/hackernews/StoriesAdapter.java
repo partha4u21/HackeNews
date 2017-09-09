@@ -1,6 +1,7 @@
 package com.piper.hackernews;
 
 import android.content.Context;
+import android.content.Intent;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -70,7 +71,8 @@ public class StoriesAdapter extends BaseAdapter {
         v.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                System.out.println("clicked");
+                Intent intent = new Intent(v.getContext(),StoriesDetailActivty.class);
+                v.getContext().startActivity(intent);
             }
         });
         return v;

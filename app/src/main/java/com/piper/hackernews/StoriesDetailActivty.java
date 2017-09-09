@@ -1,5 +1,6 @@
 package com.piper.hackernews;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.support.annotation.Nullable;
@@ -21,9 +22,10 @@ import java.util.Vector;
 public class StoriesDetailActivty extends FragmentActivity {
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState, @Nullable PersistableBundle persistentState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.detail_layout);
+
         ViewPager pager = (ViewPager) findViewById(R.id.viewPager);
         pager.setAdapter(new MyPagerAdapter(getSupportFragmentManager()));
     }
@@ -36,10 +38,12 @@ public class StoriesDetailActivty extends FragmentActivity {
 
         @Override
         public Fragment getItem(int pos) {
-            switch(pos) {
+            switch (pos) {
 
-                case 0: return new CommentsDetailFragment();
-                default: return new CommentsDetailFragment();
+                case 0:
+                    return new CommentsDetailFragment();
+                default:
+                    return new CommentsDetailFragment();
             }
         }
 

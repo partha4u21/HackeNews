@@ -1,5 +1,6 @@
 package com.piper.hackernews;
 
+import android.app.Activity;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -7,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.piper.hackernews.models.Comments;
 import com.piper.hackernews.models.TopStories;
@@ -32,6 +34,8 @@ public class CommentsDetailFragment extends Fragment {
     ListView listView;
     CommentsAdapter commentsAdapter;
     Realm realm = null;
+    Activity mActivity;
+    CreateCommentRequest createCommentRequest;
     private OkHttpClient client = new OkHttpClient();
     ArrayList<Comments> commentsArrayList = new ArrayList<>();
 
@@ -42,8 +46,10 @@ public class CommentsDetailFragment extends Fragment {
         listView = (ListView) view.findViewById(R.id.comments_list);
 
         Realm realm = Realm.getInstance(Realm.getDefaultConfiguration());
-        realm.beginTransaction();
-        RealmResults<Comments> wisdom = realm.where(Comments.class).equalTo("storyId", ((StoriesDetailActivity) getActivity()).getID()).findAll();
+        if (!realm.isInTransaction()) {
+            realm.beginTransaction();
+        }
+        RealmResults<Comments> wisdom = realm.where(Comments.class).equalTo("storyId", ((StoriesDetailActivity) mActivity).getID()).findAll();
         realm.commitTransaction();
         realm.close();
         for (int j = 0; j < wisdom.size(); j++) {
@@ -57,23 +63,42 @@ public class CommentsDetailFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        realm = Realm.getInstance(Realm.getDefaultConfiguration());
+    }
+
     private void updateListView() {
-        Realm realm = Realm.getInstance(Realm.getDefaultConfiguration());
-        realm.beginTransaction();
-        RealmResults<Comments> results = realm.where(Comments.class).equalTo("storyId", ((StoriesDetailActivity) getActivity()).getID()).findAll();
-        realm.commitTransaction();
-        realm.close();
-        commentsArrayList.clear();
-        for (int j = 0; j < results.size(); j++) {
-            commentsArrayList.add(results.get(j));
+        try {
+            Realm realm = Realm.getInstance(Realm.getDefaultConfiguration());
+            realm.beginTransaction();
+            RealmResults<Comments> results = realm.where(Comments.class).equalTo("storyId", ((StoriesDetailActivity) mActivity).getID()).findAll();
+            realm.commitTransaction();
+            realm.close();
+            commentsArrayList.clear();
+            for (int j = 0; j < results.size(); j++) {
+                commentsArrayList.add(results.get(j));
+            }
+            commentsAdapter.notifyDataSetChanged();
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+            Toast.makeText(mActivity, "Something went wrong", Toast.LENGTH_SHORT).show();
         }
-        commentsAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        mActivity = activity;
     }
 
     private void addComments() {
         realm = Realm.getInstance(Realm.getDefaultConfiguration());
         realm.beginTransaction();
-        TopStories results = realm.where(TopStories.class).equalTo("id", ((StoriesDetailActivity) getActivity()).getID()).findFirst();
+        TopStories results = realm.where(TopStories.class).equalTo("id", ((StoriesDetailActivity) mActivity).getID()).findFirst();
+        realm.commitTransaction();
+        realm.close();
         try {
             JSONArray kids = new JSONArray(results.getKids());
             for (int j = 0; j < kids.length(); j++) {
@@ -82,14 +107,13 @@ public class CommentsDetailFragment extends Fragment {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        realm.commitTransaction();
-        realm.close();
+
         System.out.println("Comments insert complete");
     }
 
     private void getStory(String id) {
-        CreateCommentRequest createTopStoryRequest = new CreateCommentRequest();
-        createTopStoryRequest.execute("https://hacker-news.firebaseio.com/v0/item/" + id + ".json?print=pretty");
+        createCommentRequest = new CreateCommentRequest();
+        createCommentRequest.execute("https://hacker-news.firebaseio.com/v0/item/" + id + ".json?print=pretty");
     }
 
     private class CreateCommentRequest extends AsyncTask<String, Void, String> {
@@ -103,7 +127,7 @@ public class CommentsDetailFragment extends Fragment {
                 response = client.newCall(request).execute();
                 if (response != null) {
                     JSONObject result = new JSONObject(response.body().string());
-                    Realm realm = Realm.getInstance(Realm.getDefaultConfiguration());
+                    realm = Realm.getInstance(Realm.getDefaultConfiguration());
                     realm.beginTransaction();
                     String id = String.valueOf(result.getString("id"));
                     Comments wisdom = realm.where(Comments.class).equalTo("commentId", id).findFirst();
@@ -111,7 +135,7 @@ public class CommentsDetailFragment extends Fragment {
                     if (!deleted && wisdom == null) {
                         Comments comments = realm.createObject(Comments.class);
                         if (comments != null) {
-                            comments.setStoryId(((StoriesDetailActivity) getActivity()).getID());
+                            comments.setStoryId(((StoriesDetailActivity) mActivity).getID());
                             comments.setCommentId(id);
                             comments.setComment(result.getString("text"));
                             comments.setTime(result.optString("time"));
@@ -143,6 +167,8 @@ public class CommentsDetailFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-        realm.close();
+        if (createCommentRequest != null && createCommentRequest.getStatus() == AsyncTask.Status.RUNNING) {
+            createCommentRequest.cancel(true);
+        }
     }
 }

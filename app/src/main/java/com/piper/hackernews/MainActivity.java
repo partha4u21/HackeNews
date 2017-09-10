@@ -22,6 +22,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.piper.hackernews.models.TopStories;
 import com.squareup.okhttp.OkHttpClient;
@@ -52,12 +53,6 @@ public class MainActivity extends AppCompatActivity implements ServiceCallback {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
-
         myRealm = Realm.getInstance(Realm.getDefaultConfiguration());
         instance = this;
 
@@ -71,6 +66,9 @@ public class MainActivity extends AppCompatActivity implements ServiceCallback {
     }
 
     private void updateListView() {
+        if (topStoriesArrayList.size() == 0) {
+            Toast.makeText(this, "Please wait ... updating stories", Snackbar.LENGTH_SHORT).show();
+        }
         Realm myRealm = Realm.getInstance(Realm.getDefaultConfiguration());
         RealmResults<TopStories> results = myRealm.where(TopStories.class).findAll();
         myRealm.beginTransaction();
@@ -129,12 +127,7 @@ public class MainActivity extends AppCompatActivity implements ServiceCallback {
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
+        super.onBackPressed();
     }
 
     @Override

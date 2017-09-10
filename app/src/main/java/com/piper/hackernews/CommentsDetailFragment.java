@@ -2,7 +2,6 @@ package com.piper.hackernews;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,7 +10,6 @@ import android.widget.ListView;
 
 import com.piper.hackernews.models.Comments;
 import com.piper.hackernews.models.TopStories;
-import com.piper.hackernews.models.TopStoriesId;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
@@ -25,8 +23,6 @@ import java.util.ArrayList;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
-
-import static android.R.attr.id;
 
 /**
  * Created by parthamurmu on 09/09/17.
@@ -46,39 +42,48 @@ public class CommentsDetailFragment extends Fragment {
         listView = (ListView) view.findViewById(R.id.comments_list);
 
         Realm realm = Realm.getInstance(Realm.getDefaultConfiguration());
-        RealmResults<Comments> wisdom = realm.where(Comments.class).findAll();
+        realm.beginTransaction();
+        RealmResults<Comments> wisdom = realm.where(Comments.class).equalTo("storyId", ((StoriesDetailActivity) getActivity()).getID()).findAll();
+        realm.commitTransaction();
+        realm.close();
         for (int j = 0; j < wisdom.size(); j++) {
             commentsArrayList.add(wisdom.get(j));
         }
 
         commentsAdapter = new CommentsAdapter(getActivity(), commentsArrayList);
         listView.setAdapter(commentsAdapter);
+        addComments();
         updateListView();
         return view;
     }
 
     private void updateListView() {
-        addComments();
+        Realm realm = Realm.getInstance(Realm.getDefaultConfiguration());
+        realm.beginTransaction();
+        RealmResults<Comments> results = realm.where(Comments.class).equalTo("storyId", ((StoriesDetailActivity) getActivity()).getID()).findAll();
+        realm.commitTransaction();
+        realm.close();
+        commentsArrayList.clear();
+        for (int j = 0; j < results.size(); j++) {
+            commentsArrayList.add(results.get(j));
+        }
         commentsAdapter.notifyDataSetChanged();
     }
 
     private void addComments() {
         realm = Realm.getInstance(Realm.getDefaultConfiguration());
         realm.beginTransaction();
-        RealmResults<TopStories> resultsStories = realm.where(TopStories.class).findAll();
+        TopStories results = realm.where(TopStories.class).equalTo("id", ((StoriesDetailActivity) getActivity()).getID()).findFirst();
         try {
-            for (int i = 0; i < resultsStories.size(); i++) {
-                if (resultsStories.get(i).getId().contentEquals(((StoriesDetailActivty) getActivity()).getID())) {
-                    JSONArray kids = new JSONArray(resultsStories.get(i).getKids());
-                    for (int j = 0; j < (kids.length() > 2 ? 2 : kids.length()); j++) {
-                        getStory(kids.get(j).toString());
-                    }
-                }
+            JSONArray kids = new JSONArray(results.getKids());
+            for (int j = 0; j < kids.length(); j++) {
+                getStory(kids.get(j).toString());
             }
         } catch (JSONException e) {
             e.printStackTrace();
         }
         realm.commitTransaction();
+        realm.close();
         System.out.println("Comments insert complete");
     }
 
@@ -99,18 +104,23 @@ public class CommentsDetailFragment extends Fragment {
                 if (response != null) {
                     JSONObject result = new JSONObject(response.body().string());
                     Realm realm = Realm.getInstance(Realm.getDefaultConfiguration());
+                    realm.beginTransaction();
                     String id = String.valueOf(result.getString("id"));
-                    Comments wisdom = realm.where(Comments.class).equalTo("id", id).findFirst();
-                    if (wisdom == null) {
-                        realm.beginTransaction();
+                    Comments wisdom = realm.where(Comments.class).equalTo("commentId", id).findFirst();
+                    boolean deleted = result.optBoolean("deleted", false);
+                    if (!deleted && wisdom == null) {
                         Comments comments = realm.createObject(Comments.class);
-                        comments.setId(String.valueOf(result.getString("id")));
-                        comments.setComment(result.getString("text"));
-                        comments.setTime(result.optString("time"));
-                        realm.commitTransaction();
-                        commentsArrayList.add(comments);
-                        System.out.println(urls[0] + "added");
+                        if (comments != null) {
+                            comments.setStoryId(((StoriesDetailActivity) getActivity()).getID());
+                            comments.setCommentId(id);
+                            comments.setComment(result.getString("text"));
+                            comments.setTime(result.optString("time"));
+                            commentsArrayList.add(comments);
+                            realm.commitTransaction();
+                            System.out.println(urls[0] + "added");
+                        }
                     }
+                    realm.close();
                     return response.toString();
                 }
             } catch (IOException e) {
@@ -125,7 +135,9 @@ public class CommentsDetailFragment extends Fragment {
         @Override
         protected void onPostExecute(String result) {
             System.out.println("Comments Insert complete");
+            updateListView();
         }
+
     }
 
     @Override

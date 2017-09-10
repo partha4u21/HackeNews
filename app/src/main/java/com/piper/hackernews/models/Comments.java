@@ -10,7 +10,10 @@ import io.realm.annotations.Required;
 public class Comments extends RealmObject {
 
     @Required
-    private String id;
+    private String storyId;
+
+    @Required
+    private String commentId;
 
     @Required
     private String comment;
@@ -18,13 +21,22 @@ public class Comments extends RealmObject {
     @Required
     private String time;
 
-    public void setId(String id) {
-        this.id = id;
+    public void setCommentId(String commentId) {
+        this.commentId = commentId;
     }
 
-    public String getId() {
-        return id;
+    public String getCommentId() {
+        return commentId;
     }
+
+    public void setStoryId(String storyId) {
+        this.storyId = storyId;
+    }
+
+    public String getStoryId() {
+        return storyId;
+    }
+
 
     public void setComment(String comment) {
         this.comment = comment;

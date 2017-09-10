@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="0.6"
-        android:background="#C0392B"
+        android:background="#2471A3"
         android:orientation="vertical"
         android:padding="30dp"
         android:paddingBottom="10dp">
@@ -68,10 +68,11 @@
         android:layout_weight="0.4">
 
         <android.support.v4.view.PagerTitleStrip
+            style="@style/viewPagerTitleStrip"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="top"
-            android:background="#80C0392B"
+            android:background="#5499C7"
             android:padding="10dp" />
 
     </android.support.v4.view.ViewPager>

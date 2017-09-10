@@ -32,8 +32,7 @@ import io.realm.Realm;
 import io.realm.RealmResults;
 
 
-public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, ServiceCallback {
+public class MainActivity extends AppCompatActivity implements ServiceCallback {
 
     private OkHttpClient client = new OkHttpClient();
     private Realm myRealm;
@@ -58,9 +57,6 @@ public class MainActivity extends AppCompatActivity
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
 
         myRealm = Realm.getInstance(Realm.getDefaultConfiguration());
         instance = this;
@@ -112,7 +108,7 @@ public class MainActivity extends AppCompatActivity
     protected ServiceConnection mServerConn = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder binder) {
-            TopStoriesFetchService.LocalBinder localBinder = (TopStoriesFetchService.LocalBinder)binder;
+            TopStoriesFetchService.LocalBinder localBinder = (TopStoriesFetchService.LocalBinder) binder;
             fetchService = localBinder.getService();
             bound = true;
             fetchService.setCallbacks(MainActivity.this);
@@ -129,7 +125,6 @@ public class MainActivity extends AppCompatActivity
     protected void onResume() {
         super.onResume();
         startService();
-
     }
 
     @Override
@@ -139,6 +134,14 @@ public class MainActivity extends AppCompatActivity
             drawer.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (bound) {
+            unbindService(mServerConn);
         }
     }
 
@@ -164,22 +167,6 @@ public class MainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        }
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
-    }
-
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -191,10 +178,8 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void updateAdapter() {
-        runOnUiThread(new  Runnable()
-        {
-            public void run()
-            {
+        runOnUiThread(new Runnable() {
+            public void run() {
                 updateListView();
             }
         });

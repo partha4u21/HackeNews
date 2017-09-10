@@ -61,11 +61,12 @@ public class TopStoriesFetchService extends Service {
         RealmResults<TopStoriesId> results = realm.where(TopStoriesId.class).findAll();
         realm.commitTransaction();
 
-        for (int i = 0; i < results.size(); i++) {
-            insertTopStories(results.get(i).getStoriesId());
+        for (int i = 0; i < (results.size() > 50 ? 50 : results.size()); i++) {
+            TopStories wisdom = realm.where(TopStories.class).equalTo("id", results.get(i).getStoriesId()).findFirst();
+            if (wisdom == null) {
+                insertTopStories(results.get(i).getStoriesId());
+            }
         }
-        System.out.println("Insert complete");
-
     }
 
     private void insertTopStories(String id) {
@@ -86,24 +87,21 @@ public class TopStoriesFetchService extends Service {
                     JSONObject result = new JSONObject(response.body().string());
                     Realm realm = Realm.getInstance(Realm.getDefaultConfiguration());
                     String id = String.valueOf(result.getInt("id"));
-
-                    TopStories wisdom = realm.where(TopStories.class).equalTo("id", id).findFirst();
-                    if (wisdom == null) {
-                        realm.beginTransaction();
-                        TopStories topStoriesId = realm.createObject(TopStories.class);
-                        topStoriesId.setId(String.valueOf(result.getInt("id")));
-                        topStoriesId.setTitle(result.getString("title"));
-                        topStoriesId.setParent(result.optString("parent", ""));
-                        topStoriesId.setKids(result.optJSONArray("kids") != null ? result.optJSONArray("kids").toString() : new JSONArray().toString());
-                        topStoriesId.setScore(result.optString("score", ""));
-                        topStoriesId.setUrl(result.optString("url", ""));
-                        topStoriesId.setTime(result.getString("time"));
-                        topStoriesId.setType(result.getString("type"));
-                        topStoriesId.setUsername(result.getString("by"));
-                        realm.commitTransaction();
-                        System.out.println(urls[0] + "added");
-                    }
+                    realm.beginTransaction();
+                    TopStories topStoriesId = realm.createObject(TopStories.class);
+                    topStoriesId.setId(String.valueOf(result.getInt("id")));
+                    topStoriesId.setTitle(result.getString("title"));
+                    topStoriesId.setParent(result.optString("parent", ""));
+                    topStoriesId.setKids(result.optJSONArray("kids") != null ? result.optJSONArray("kids").toString() : new JSONArray().toString());
+                    topStoriesId.setScore(result.optString("score", ""));
+                    topStoriesId.setUrl(result.optString("url", ""));
+                    topStoriesId.setTime(result.getString("time"));
+                    topStoriesId.setType(result.getString("type"));
+                    topStoriesId.setUsername(result.getString("by"));
+                    realm.commitTransaction();
+                    System.out.println(urls[0] + "added");
                     realm.close();
+                    System.out.println("Insert complete");
                     return response.toString();
                 }
             } catch (IOException e) {
@@ -120,7 +118,6 @@ public class TopStoriesFetchService extends Service {
             if (callback != null) {
                 callback.updateAdapter();
             }
-            System.out.println("Insert complete");
         }
     }
 

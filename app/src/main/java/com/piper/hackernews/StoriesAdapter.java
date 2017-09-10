@@ -2,7 +2,6 @@ package com.piper.hackernews;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +10,9 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.piper.hackernews.models.TopStories;
+
+import org.json.JSONArray;
+import org.json.JSONException;
 
 import java.util.ArrayList;
 
@@ -24,9 +26,9 @@ public class StoriesAdapter extends BaseAdapter {
     private Context context;
     private LayoutInflater inflater;
 
-    public StoriesAdapter(Context context, ArrayList<TopStories> personDetailsArrayList) {
+    public StoriesAdapter(Context context, ArrayList<TopStories> storiesArrayList) {
         this.context = context;
-        this.storiesArrayList = personDetailsArrayList;
+        this.storiesArrayList = storiesArrayList;
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
@@ -69,11 +71,17 @@ public class StoriesAdapter extends BaseAdapter {
         final String time = (String) DateUtils.getRelativeTimeSpanString(Long.parseLong(storiesArrayList.get(position).getTime()) * 1000, System.currentTimeMillis(), 0L);
         holder.time.setText(time);
         holder.username.setText(storiesArrayList.get(position).getUsername());
+        try {
+            int commentCount = new JSONArray(storiesArrayList.get(position).getKids()).length();
+            holder.comment_count.setText(String.valueOf(commentCount));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
         v.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(v.getContext(), StoriesDetailActivty.class);
+                Intent intent = new Intent(v.getContext(), StoriesDetailActivity.class);
                 intent.putExtra("title", storiesArrayList.get(position).getTitle());
                 intent.putExtra("id", storiesArrayList.get(position).getId());
                 intent.putExtra("url", storiesArrayList.get(position).getUrl());

@@ -23,7 +23,7 @@ import java.util.Vector;
  * Created by parthamurmu on 09/09/17.
  */
 
-public class StoriesDetailActivty extends FragmentActivity implements ShareDataInterface {
+public class StoriesDetailActivity extends FragmentActivity implements ShareDataInterface {
 
     TextView title, url, time, userName;
     JSONArray comments;
@@ -77,20 +77,20 @@ public class StoriesDetailActivty extends FragmentActivity implements ShareDataI
         public Fragment getItem(int pos) {
             switch (pos) {
                 case 0:
-                    return new ArticleDetailFragment();
-                case 1:
                     return new CommentsDetailFragment();
-                default:
+                case 1:
                     return new ArticleDetailFragment();
+                default:
+                    return new CommentsDetailFragment();
             }
         }
 
         @Override
         public CharSequence getPageTitle(int position) {
             if (position == 1) {
-                return "Comments";
+                return "Article";
             }
-            return "Article";
+            return "Comments";
         }
 
         @Override

@@ -208,7 +208,9 @@ public class Login extends FragmentActivity implements GoogleApiClient.Connectio
 
     //After a successful sign into Google, this method now authenticates the user with Firebase
     private void firebaseAuthWithGoogle(AuthCredential credential) {
-        Utils.showProgressDialog(this);
+        if (!((Login) mContext).isFinishing()) {
+            Utils.showProgressDialog(this);
+        }
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
@@ -228,7 +230,9 @@ public class Login extends FragmentActivity implements GoogleApiClient.Connectio
                             startActivity(intent);
                             finish();
                         }
-                        Utils.hideProgressDialog();
+                        if (!((Login) mContext).isFinishing()) {
+                            Utils.hideProgressDialog();
+                        }
                     }
                 });
     }
@@ -245,7 +249,9 @@ public class Login extends FragmentActivity implements GoogleApiClient.Connectio
     @Override
     protected void onStop() {
         super.onStop();
-        Utils.hideProgressDialog();
+        if (!((Login) mContext).isFinishing()) {
+            Utils.hideProgressDialog();
+        }
         if (mAuthListener != null) {
             mAuth.removeAuthStateListener(mAuthListener);
         }

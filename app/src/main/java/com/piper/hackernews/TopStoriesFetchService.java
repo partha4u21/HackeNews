@@ -50,7 +50,6 @@ public class TopStoriesFetchService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         // Let it continue running until it is stopped.
-        Toast.makeText(this, "Service Started", Toast.LENGTH_LONG).show();
         realm = Realm.getInstance(Realm.getDefaultConfiguration());
         insertAndUpdateDb();
         return START_STICKY;
@@ -182,6 +181,5 @@ public class TopStoriesFetchService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Toast.makeText(this, "Service Destroyed", Toast.LENGTH_LONG).show();
     }
 }
